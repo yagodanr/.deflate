@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define BUFFER_SIZE 5
+
 
 int main(int argc, char *argv[]) {
     if(argc != 2) {
@@ -19,10 +21,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    char ch;
-    while(fin.get(ch)) {
-        cout << ch;
+    char ch[BUFFER_SIZE];
+    while(fin.read(ch, BUFFER_SIZE)) {
+        for(int i=0; i<BUFFER_SIZE; ++i) {
+            cout << ch[i];
+        }
+        cout << "+" <<  endl;
     }
+
 
     fin.close();
     return 0;
