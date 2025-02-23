@@ -8,7 +8,7 @@
 
 
 using namespace std;
-#define MAX_BUFFER_SIZE 5
+#define MAX_BUFFER_SIZE 4096
 
 template<typename T>
 vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
@@ -69,6 +69,9 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
         //     cout << x;
         // }
         // cout << endl << p_index << " " << p_size << " " << p_next << endl << endl;
+        if(!p_next) {
+            break;
+        }
         code.push_back({p_index, p_size, p_next});
     }
 
@@ -117,7 +120,7 @@ int main(int argc, char *argv[]) {
         cout << buffer << endl;
         auto code = LZ77(buffer, length);
         for(const auto &x: code) {
-            cout << get<0>(x) << " " << get<1>(x) << " " << get<2>(x) << endl;
+            cout << "(" << get<0>(x) << " " << get<1>(x) << " \"" << get<2>(x) << "\")"<< endl;
         }
 
         delete[] buffer;
