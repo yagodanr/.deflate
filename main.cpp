@@ -5,6 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <list>
+#include <cstring>
 
 
 using namespace std;
@@ -25,18 +26,17 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
 
         int cur_index = 0;
         for(auto it=buffer.end(); it!=buffer.begin(); --it, ++cur_index) {
-            if(it == buffer.end()) {
-                continue;
-            }
 
             int cur = i;
             int cur_size = 0;
             T cur_next = inp[cur];
 
             auto t = it;
+            --t;
             while(cur < size) {
                 if(t == buffer.end()) {
                     t = it;
+                    --t;
                 }
                 if(*t != cur_next) {
                     break;
@@ -69,10 +69,8 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
         //     cout << x;
         // }
         // cout << endl << p_index << " " << p_size << " " << p_next << endl << endl;
-        if(!p_next) {
-            break;
-        }
         code.push_back({p_index, p_size, p_next});
+
     }
 
     return code;
@@ -81,8 +79,10 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
 
 int main(int argc, char *argv[]) {
     if(argc != 2) {
-        cout << "Wrong arguments" << endl;
-        return 1;
+        argc = 2;
+        argv = new char*[2];
+        argv[1] = new char[strlen("text.txt")+1];
+        argv[1] = "text.txt";
     }
 
     ifstream fin;
