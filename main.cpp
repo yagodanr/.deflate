@@ -11,7 +11,7 @@ using namespace std;
 #define MAX_BUFFER_SIZE 5
 
 template<typename T>
-vector<tuple<int, int, T>> LZ77(const T inp[], const int size) {
+vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
     vector<tuple<int, int, T>> code;
 
     list<T> buffer;
@@ -62,6 +62,13 @@ vector<tuple<int, int, T>> LZ77(const T inp[], const int size) {
                 ++buffer_size;
             }
         }
+        // cout << " \"" << inp[size-1] << "\"" ;
+
+        // cout << endl;
+        // for(auto &x: buffer) {
+        //     cout << x;
+        // }
+        // cout << endl << p_index << " " << p_size << " " << p_next << endl << endl;
         code.push_back({p_index, p_size, p_next});
     }
 
