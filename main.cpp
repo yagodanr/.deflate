@@ -2,10 +2,11 @@
 #include <bitset>
 #include <set>
 #include <fstream>
+#include <vector>
+#include <cstring>
 
 using namespace std;
 
-#define BUFFER_SIZE 5
 
 
 int main(int argc, char *argv[]) {
@@ -21,15 +22,33 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    char ch[BUFFER_SIZE];
-    while(fin.read(ch, BUFFER_SIZE)) {
-        for(int i=0; i<BUFFER_SIZE; ++i) {
-            cout << ch[i];
+    if (fin) {
+        //Reads the whole file
+        // get length of file:
+        fin.seekg (0, fin.end);
+        int length = fin.tellg();
+        fin.seekg (0, fin.beg);
+
+        char *buffer = new char[length];
+
+        cout << "Reading " << length << " characters... ";
+        // read data as a block:
+        fin.read (buffer,length);
+
+        if (fin)
+        cout << "all characters read successfully." << endl;
+        else {
+            cout << "error: only " << fin.gcount() << " could be read" << endl;
+            fin.close();
+            delete[] buffer;
+            return 1;
+
         }
-        cout << "+" <<  endl;
+        fin.close();
+
+        cout << buffer;
+
+        delete[] buffer;
     }
-
-
-    fin.close();
     return 0;
 }
