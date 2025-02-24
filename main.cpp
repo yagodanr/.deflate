@@ -1,12 +1,11 @@
 #include <iostream>
-#include <bitset>
-#include <set>
 #include <fstream>
 #include <vector>
 #include <tuple>
 #include <list>
 #include <cstring>
-
+#include <map>
+#include <queue>
 
 using namespace std;
 #define MAX_BUFFER_SIZE 4096
@@ -24,7 +23,7 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
         int p_size = 0;
         T p_next = inp[i];
 
-        int cur_index = 0;
+        int cur_index = 1;
         for(auto it=buffer.end(); it!=buffer.begin(); --it, ++cur_index) {
 
             int cur = i;
@@ -76,13 +75,96 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
     return code;
 }
 
+template<typename T>
+class Tree {
+public:
+    pair<int, T> val;
+    Tree<T> *left;
+    Tree<T> *right;
+
+    Tree() {
+        this->left = nullptr;
+        this->right = nullptr;
+    }
+    Tree(const pair<int, T>& val) {
+        this->val = val;
+        this->left = nullptr;
+        this->right = nullptr;
+    }
+
+    bool operator>(Tree<T> *other) {
+        return this->val.first > other->val.first;
+    }
+    bool operator<(Tree<T> *other) {
+        return this->val.first < other->val.first;
+    }
+};
+
+
+template<typename T>
+void get_codes(Tree<T> *root, map<T, vector<bool>> &mp, vector<bool> code=vector<bool>()) {
+    if(!root->left && !root->right) {
+        mp[root->val.second] = code;
+        return ;
+    }
+    code.push_back(0);
+    get_codes(root->left, mp, code);
+    code[code.size()-1] = 1;
+    get_codes(root->right, mp, code);
+
+    return ;
+}
+
+template<typename T>
+pair<vector<vector<bool>>, map<T, vector<bool>>> Huffman(vector<T> inp) {
+    map<T, int> counter;
+    int total_count = inp.size();
+
+    for(const auto &x: inp) {
+        ++counter[x];
+    }
+
+    auto comp = [](Tree<T>* a, Tree<T>* b) {
+        return a->val.first > b->val.first;
+    };
+    priority_queue<Tree<T>*, vector<Tree<T>*>, decltype(comp)> p_q(comp);
+
+    for(auto &x: counter) {
+        pair<int, T> temp = {x.second, x.first};
+        Tree<T> *tr = new Tree<T>(temp);
+        p_q.push(tr);
+    }
+
+    Tree<T> *root;
+    while(p_q.size() > 1){
+        auto x = p_q.top();
+        p_q.pop();
+        auto y = p_q.top();
+        p_q.pop();
+
+        int sum = x->val.first + y->val.first;
+        Tree<T> *newNode = new Tree<T>;
+        root = newNode;
+        newNode->val.first = sum;
+        newNode->left = x;
+        newNode->right = y;
+        p_q.push(newNode);
+    }
+
+
+    map<T, vector<bool>> mp;
+    get_codes(root, mp);
+    vector<vector<bool>> tmp;
+    return {tmp, mp};
+
+}
 
 int main(int argc, char *argv[]) {
     if(argc != 2) {
         argc = 2;
         argv = new char*[2];
         argv[1] = new char[strlen("text.txt")+1];
-        argv[1] = "text.txt";
+        strcpy(argv[1], "lz_test3.txt");
     }
 
     ifstream fin;
@@ -124,6 +206,16 @@ int main(int argc, char *argv[]) {
         }
 
         delete[] buffer;
+        auto p = Huffman(code);
+        for(auto &x: p.second) {
+            cout << "\"" << get<0>(x.first) << " " << get<1>(x.first) << " " << get<2>(x.first) << "\" -> \"";
+            for(auto bi: x.second) {
+                cout << bi;
+            }
+            cout << "\"" << endl;
+        }
+
+        // auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15}));
     }
     return 0;
 }
