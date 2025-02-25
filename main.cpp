@@ -9,6 +9,7 @@
 
 using namespace std;
 #define MAX_BUFFER_SIZE 4096
+#define DEBUG
 
 template<typename T>
 vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
@@ -171,12 +172,16 @@ pair<vector<bool>, map<T, vector<bool>>> Huffman(vector<T> inp) {
 }
 
 int main(int argc, char *argv[]) {
-    if(argc != 2) {
-        argc = 2;
+    if(argc != 3) {
+        argc = 3;
         argv = new char*[2];
-        argv[1] = new char[strlen("text.txt")+1];
+        argv[1] = new char[strlen("lz_test3.txt")+1];
         strcpy(argv[1], "lz_test3.txt");
+        argv[2] = new char[strlen("out.deflate")+1];
+        strcpy(argv[2], "out.deflate");
+
     }
+
 
     ifstream fin;
     fin.open(argv[1], ios::binary);
@@ -209,15 +214,17 @@ int main(int argc, char *argv[]) {
         }
         fin.close();
 
-        // cout << buffer;
-        cout << buffer << endl;
         auto code = LZ77(buffer, length);
+        #ifdef DEBUG
+        cout << buffer << endl;
         for(const auto &x: code) {
             cout << "(" << get<0>(x) << " " << get<1>(x) << " \"" << get<2>(x) << "\")"<< endl;
         }
+        #endif
 
         delete[] buffer;
         auto p = Huffman(code);
+        #ifdef DEBUG
         for(auto &x: p.second) {
             cout << "\"" << get<0>(x.first) << " " << get<1>(x.first) << " " << get<2>(x.first) << "\" -> \"";
             for(auto bi: x.second) {
@@ -229,9 +236,12 @@ int main(int argc, char *argv[]) {
             cout << x;
         }
         cout << endl;
+        #endif
 
-        cout << endl;
+
+        #ifdef DEBUG
         auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1}));
+        cout << endl;
         for(auto &x: k.second) {
             cout << "\"" << x.first << "\" -> \"";
             for(auto bi: x.second) {
@@ -243,6 +253,22 @@ int main(int argc, char *argv[]) {
             cout << x;
         }
         cout << endl;
+        #endif
+
+        ofstream fout;
+        fout.open(argv[2], ios::binary);
+        if(!fout.is_open()) {
+            cout << "Couldn't open the file" << endl;
+            return 1;
+        }
+        long long dict_size = sizeof p.second;
+        fout.write((char*)&dict_size, sizeof dict_size);
+        fout.write((char*)&p.second, sizeof p.second);
+        long long code_size = sizeof p.first;
+        fout.write((char*)&code_size, sizeof code_size);
+        fout.write((char*)&p.first, sizeof p.first);
+
+
     }
     return 0;
 }
