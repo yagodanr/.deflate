@@ -15,6 +15,27 @@ using namespace std;
 #define DEBUG
 
 
+template <typename T>
+vector<tuple<int, int, T>> decode_Huffman(vector<bool> &code, map<tuple<int, int, T>, vector<bool>> &dict) {
+    long long n = code.size();
+
+    vector<tuple<int, int, T>> decoded;
+
+    vector<bool> cur;
+    for(long long i=0; i<n; ++i) {
+        cur.push_back(code[i]);
+        for(auto &[key, value]: dict) {
+            if(value == cur) {
+                decoded.push_back(key);
+                cur = {};
+                break;
+            }
+        }
+    }
+    return decoded;
+}
+
+
 
 int main(int argc, char *argv[]) {
     if(argc != 3) {
@@ -48,6 +69,13 @@ int main(int argc, char *argv[]) {
             cout << x;
         }
         cout << endl;
+        #endif
+
+        vector<tuple<int, int, char>> decoded_h = decode_Huffman(code, dict);
+        #ifdef DEBUG
+        for(const auto &x: decoded_h) {
+            cout << "(" << get<0>(x) << " " << get<1>(x) << " \"" << get<2>(x) << "\")"<< endl;
+        }
         #endif
     }
     return 0;
