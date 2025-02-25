@@ -1,4 +1,7 @@
+encode
+decode
+test_file_binary/write_binary_obj
+test_file_binary/write_binary_dict
 .vscode
 build/
 *.deflate
-*

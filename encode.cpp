@@ -12,7 +12,7 @@
 
 using namespace std;
 #define MAX_BUFFER_SIZE 4096
-#define DEBUG
+// #define DEBUG
 
 template<typename T>
 vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
