@@ -2,3 +2,6 @@ main
 .vscode
 debug
 build/
+encode
+decode
+*.deflate

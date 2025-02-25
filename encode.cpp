@@ -7,6 +7,9 @@
 #include <map>
 #include <queue>
 
+#include "rw_binary.cpp"
+
+
 using namespace std;
 #define MAX_BUFFER_SIZE 4096
 #define DEBUG
@@ -175,10 +178,10 @@ int main(int argc, char *argv[]) {
     if(argc != 3) {
         argc = 3;
         argv = new char*[2];
-        argv[1] = new char[strlen("lz_test3.txt")+1];
-        strcpy(argv[1], "lz_test3.txt");
-        argv[2] = new char[strlen("out.deflate")+1];
-        strcpy(argv[2], "out.deflate");
+        argv[1] = new char[strlen("lz_test1.txt")+1];
+        strcpy(argv[1], "lz_test1.txt");
+        argv[2] = new char[strlen("lz_test1.deflate")+1];
+        strcpy(argv[2], "lz_test1.deflate");
 
     }
 
@@ -190,85 +193,79 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (fin) {
-        //Reads the whole file
-        // get length of file:
-        fin.seekg (0, fin.end);
-        int length = fin.tellg();
-        fin.seekg (0, fin.beg);
+    if (!fin) {
+        cout << "Problem with file open the file" << endl;
+        return 1;
+    }
+    //Reads the whole file
+    // get length of file:
+    fin.seekg (0, fin.end);
+    int length = fin.tellg();
+    fin.seekg (0, fin.beg);
 
-        char *buffer = new char[length];
+    char *buffer = new char[length];
 
-        cout << "Reading " << length << " characters... ";
-        // read data as a block:
-        fin.read(buffer,length);
+    cout << "Reading " << length << " characters... ";
+    // read data as a block:
+    fin.read(buffer,length);
 
-        if (fin)
-            cout << "all " << length << " characters read successfully." << endl;
-        else {
-            cout << "error: only " << fin.gcount() << " could be read" << endl;
-            fin.close();
-            delete[] buffer;
-            return 1;
-
-        }
+    if (fin)
+        cout << "all " << length << " characters read successfully." << endl;
+    else {
+        cout << "error: only " << fin.gcount() << " could be read" << endl;
         fin.close();
-
-        auto code = LZ77(buffer, length);
-        #ifdef DEBUG
-        cout << buffer << endl;
-        for(const auto &x: code) {
-            cout << "(" << get<0>(x) << " " << get<1>(x) << " \"" << get<2>(x) << "\")"<< endl;
-        }
-        #endif
-
         delete[] buffer;
-        auto p = Huffman(code);
-        #ifdef DEBUG
-        for(auto &x: p.second) {
-            cout << "\"" << get<0>(x.first) << " " << get<1>(x.first) << " " << get<2>(x.first) << "\" -> \"";
-            for(auto bi: x.second) {
-                cout << bi;
-            }
-            cout << "\"" << endl;
-        }
-        for(auto x: p.first) {
-            cout << x;
-        }
-        cout << endl;
-        #endif
-
-
-        #ifdef DEBUG
-        auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1}));
-        cout << endl;
-        for(auto &x: k.second) {
-            cout << "\"" << x.first << "\" -> \"";
-            for(auto bi: x.second) {
-                cout << bi;
-            }
-            cout << "\"" << endl;
-        }
-        for(auto x: k.first) {
-            cout << x;
-        }
-        cout << endl;
-        #endif
-
-        ofstream fout;
-        fout.open(argv[2], ios::binary);
-        if(!fout.is_open()) {
-            cout << "Couldn't open the file" << endl;
-            return 1;
-        }
-        long long dict_size = sizeof p.second;
-        fout.write((char*)&dict_size, sizeof dict_size);
-        fout.write((char*)&p.second, sizeof p.second);
-        long long code_size = sizeof p.first;
-        fout.write((char*)&code_size, sizeof code_size);
-        fout.write((char*)&p.first, sizeof p.first);
-
+        return 1;
 
     }
+    fin.close();
+
+    auto code = LZ77(buffer, length);
+    #ifdef DEBUG
+    cout << buffer << endl;
+    for(const auto &x: code) {
+        cout << "(" << get<0>(x) << " " << get<1>(x) << " \"" << get<2>(x) << "\")"<< endl;
+    }
+    #endif
+
+    delete[] buffer;
+    auto p = Huffman(code);
+    #ifdef DEBUG
+    print_dict(p.second);
+    for(auto x: p.first) {
+        cout << x;
+    }
+    cout << endl;
+    #endif
+
+
+    #ifdef DEBUG
+    auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1}));
+    cout << endl;
+    for(auto &x: k.second) {
+        cout << "\"" << x.first << "\" -> \"";
+        for(auto bi: x.second) {
+            cout << bi;
+        }
+        cout << "\"" << endl;
+    }
+    for(auto x: k.first) {
+        cout << x;
+    }
+    cout << endl;
+    #endif
+
+    ofstream fout;
+    fout.open(argv[2], ios::binary);
+    if(!fout.is_open()) {
+        cout << "Couldn't open the file" << endl;
+        return 1;
+    }
+    write_dict_binary(fout, p.second);
+    long long code_size = sizeof p.first;
+    fout.write((char*)&code_size, sizeof code_size);
+    fout.write((char*)&p.first, sizeof code_size);
+    fout.close();
+
     return 0;
 }
