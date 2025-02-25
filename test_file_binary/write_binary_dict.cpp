@@ -46,6 +46,8 @@ tuple<int, int, T> read_tuple_binary(ifstream &fin) {
 
 template<typename T>
 void write_dict_binary(ofstream &fout, map<tuple<int, int, T>, vector<bool>> &dict) {
+    long long dict_size = dict.size();
+    fout.write((char*)&dict_size, sizeof dict_size);
     for(auto &x: dict) {
         write_tuple_binary(fout, x.first);
         write_vb_binary(fout, x.second);
@@ -55,8 +57,10 @@ void write_dict_binary(ofstream &fout, map<tuple<int, int, T>, vector<bool>> &di
 
 template <typename T>
 map<tuple<int, int, T>, vector<bool>> read_dict_binary(ifstream &fin) {
+    long long dict_size;
+    fin.read((char*)&dict_size, sizeof dict_size);
     map<tuple<int, int, T>, vector<bool>> dict;
-    while (true) {
+    for(int i=0; i<dict_size; ++i) {
         tuple<int, int, T> key = read_tuple_binary<T>(fin);
         if (fin.fail()) break; // Check if reading the key failed
 

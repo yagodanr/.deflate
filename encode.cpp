@@ -239,21 +239,21 @@ int main(int argc, char *argv[]) {
     #endif
 
 
-    #ifdef DEBUG
-    auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1}));
-    cout << endl;
-    for(auto &x: k.second) {
-        cout << "\"" << x.first << "\" -> \"";
-        for(auto bi: x.second) {
-            cout << bi;
-        }
-        cout << "\"" << endl;
-    }
-    for(auto x: k.first) {
-        cout << x;
-    }
-    cout << endl;
-    #endif
+    // #ifdef DEBUG
+    // auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1}));
+    // cout << endl;
+    // for(auto &x: k.second) {
+    //     cout << "\"" << x.first << "\" -> \"";
+    //     for(auto bi: x.second) {
+    //         cout << bi;
+    //     }
+    //     cout << "\"" << endl;
+    // }
+    // for(auto x: k.first) {
+    //     cout << x;
+    // }
+    // cout << endl;
+    // #endif
 
     ofstream fout;
     fout.open(argv[2], ios::binary);
@@ -262,9 +262,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     write_dict_binary(fout, p.second);
-    long long code_size = sizeof p.first;
-    fout.write((char*)&code_size, sizeof code_size);
-    fout.write((char*)&p.first, sizeof code_size);
+    write_vb_binary(fout, p.first);
     fout.close();
 
     return 0;

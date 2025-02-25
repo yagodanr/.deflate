@@ -35,12 +35,6 @@ int main() {
         cout << x;
     }
 
-    ifstream find;
-    find.open("writing_binary_dict.deflate", ios::binary);
-    map<tuple<int, int, char>, vector<bool>> dict = read_dict_binary<char>(find);
-    find.close();
-    print_dict(dict);
-
     ofstream fout;
     fout.open("writing_binary.deflate", ios::binary);
     write_vb_binary(fout, a);
