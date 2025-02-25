@@ -19,17 +19,19 @@ template <typename T>
 vector<tuple<int, int, T>> decode_Huffman(vector<bool> &code, map<tuple<int, int, T>, vector<bool>> &dict) {
     long long n = code.size();
 
+    map<vector<bool>, tuple<int, int, T>> r_dict;
+    for(auto &[key, value]: dict) {
+        r_dict[value] = key;
+    }
+
     vector<tuple<int, int, T>> decoded;
 
     vector<bool> cur;
     for(long long i=0; i<n; ++i) {
         cur.push_back(code[i]);
-        for(auto &[key, value]: dict) {
-            if(value == cur) {
-                decoded.push_back(key);
-                cur = {};
-                break;
-            }
+        if(r_dict.find(cur) != r_dict.end()) {
+            decoded.push_back(r_dict[cur]);
+            cur = {};
         }
     }
     return decoded;
