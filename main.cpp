@@ -15,7 +15,7 @@ vector<tuple<int, int, T>> LZ77(const T* inp, const int size) {
     vector<tuple<int, int, T>> code;
 
     list<T> buffer;
-    int buffer_size = 0;
+    long long buffer_size = 0;
 
     for(int i=0; i<size;) {
 
@@ -116,9 +116,9 @@ void get_codes(Tree<T> *root, map<T, vector<bool>> &mp, vector<bool> code=vector
 }
 
 template<typename T>
-pair<vector<vector<bool>>, map<T, vector<bool>>> Huffman(vector<T> inp) {
+pair<vector<bool>, map<T, vector<bool>>> Huffman(vector<T> inp) {
     map<T, int> counter;
-    int total_count = inp.size();
+    long long total_count = inp.size();
 
     for(const auto &x: inp) {
         ++counter[x];
@@ -142,7 +142,7 @@ pair<vector<vector<bool>>, map<T, vector<bool>>> Huffman(vector<T> inp) {
         auto y = p_q.top();
         p_q.pop();
 
-        int sum = x->val.first + y->val.first;
+        long long sum = x->val.first + y->val.first;
         Tree<T> *newNode = new Tree<T>;
         root = newNode;
         newNode->val.first = sum;
@@ -154,8 +154,19 @@ pair<vector<vector<bool>>, map<T, vector<bool>>> Huffman(vector<T> inp) {
 
     map<T, vector<bool>> mp;
     get_codes(root, mp);
-    vector<vector<bool>> tmp;
-    return {tmp, mp};
+    long long total_code=0;
+    for(auto &x: inp) {
+        total_code += mp[x].size();
+    }
+    vector<bool> encoded(total_code);
+
+    for(int i=0, inp_i=0; i<total_code && inp_i<inp.size(); ++inp_i) {
+        auto c = mp[inp[inp_i]];
+        for(int j=0, s=c.size(); j<s; ++j, ++i) {
+            encoded[i] = c[j];
+        }
+    }
+    return {encoded, mp};
 
 }
 
@@ -214,8 +225,24 @@ int main(int argc, char *argv[]) {
             }
             cout << "\"" << endl;
         }
+        for(auto x: p.first) {
+            cout << x;
+        }
+        cout << endl;
 
-        // auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15}));
+        cout << endl;
+        auto k = Huffman(vector<int>({1, 1, 2, 15, 32, 15, 15, 15, 15, 15, 15, 1, 1, 1, 1}));
+        for(auto &x: k.second) {
+            cout << "\"" << x.first << "\" -> \"";
+            for(auto bi: x.second) {
+                cout << bi;
+            }
+            cout << "\"" << endl;
+        }
+        for(auto x: k.first) {
+            cout << x;
+        }
+        cout << endl;
     }
     return 0;
 }
