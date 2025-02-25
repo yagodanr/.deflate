@@ -11,7 +11,7 @@
 
 
 using namespace std;
-#define MAX_BUFFER_SIZE 4096
+#define MAX_BUFFER_SIZE 32768
 // #define DEBUG
 
 
