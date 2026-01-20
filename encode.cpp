@@ -6,8 +6,9 @@
 #include <cstring>
 #include <map>
 #include <queue>
+#include <string>
 
-#include "rw_binary.cpp"
+#include "rw_binary.h"
 
 
 using namespace std;
@@ -175,19 +176,21 @@ pair<vector<bool>, map<T, vector<bool>>> Huffman(vector<T> inp) {
 }
 
 int main(int argc, char *argv[]) {
+    string input_file, output_file;
     if(argc != 3) {
-        argc = 3;
-        argv = new char*[2];
-        argv[1] = new char[strlen("lz_test1.txt")+1];
-        strcpy(argv[1], "lz_test1.txt");
-        argv[2] = new char[strlen("lz_test1.deflate")+1];
-        strcpy(argv[2], "lz_test1.deflate");
-
+        cout << "Usage: " << argv[0] << " <input_file> <output_file>" << endl;
+        cout << "Enter input file: ";
+        getline(cin, input_file);
+        cout << "Enter output file: ";
+        getline(cin, output_file);
+    } else {
+        input_file = argv[1];
+        output_file = argv[2];
     }
 
 
     ifstream fin;
-    fin.open(argv[1], ios::binary);
+    fin.open(input_file, ios::binary);
     if(!fin.is_open()) {
         cout << "Couldn't open the file" << endl;
         return 1;
@@ -256,7 +259,7 @@ int main(int argc, char *argv[]) {
     // #endif
 
     ofstream fout;
-    fout.open(argv[2], ios::binary);
+    fout.open(output_file, ios::binary);
     if(!fout.is_open()) {
         cout << "Couldn't open the file" << endl;
         return 1;
